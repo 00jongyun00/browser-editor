@@ -1,22 +1,26 @@
 import * as esbuild from 'esbuild-wasm';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import ReactDOM from 'react-dom';
 
 const App = () => {
+  const ref = useRef<any>();
   const [input, setInput] = useState('');
   const [code, setCode] = useState('');
 
   const onClick = () => {
-    console.log(input);
+    if (!ref.current) {
+      return;
+    }
+
+    console.log(ref.current);
   };
 
   const startService = async () => {
-    const service = await esbuild.startService({
+    ref.current = await esbuild.startService({
       worker: true,
       // ./public/esbuild.wasm
       wasmURL: '/esbuild.wasm',
     });
-    console.log(service);
   };
 
   useEffect(() => {
