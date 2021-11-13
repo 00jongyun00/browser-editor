@@ -7,12 +7,16 @@ const App = () => {
   const [input, setInput] = useState('');
   const [code, setCode] = useState('');
 
-  const onClick = () => {
+  const onClick = async () => {
     if (!ref.current) {
       return;
     }
+    const result = await ref.current.transform(input, {
+      loader: 'jsx',
+      target: 'es2015',
+    });
 
-    console.log(ref.current);
+    setCode(result.code);
   };
 
   const startService = async () => {
