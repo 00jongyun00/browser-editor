@@ -13,6 +13,7 @@ const App = () => {
       return;
     }
     const result = await ref.current.build({
+      // index.js 가 application 내부에 번들로 제공되는 첫번째 파일
       entryPoints: ['index.js'],
       bundle: true,
       write: false,
