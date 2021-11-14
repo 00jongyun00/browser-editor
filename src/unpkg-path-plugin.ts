@@ -1,5 +1,18 @@
 import * as esbuild from 'esbuild-wasm';
 import axios from 'axios';
+import localForage from 'localforage';
+
+const fileCache = localForage.createInstance({
+  name: 'filecache',
+});
+
+// (async () => {
+//   await fileCache.setItem('color', 'red');
+//
+//   const color = await fileCache.getItem('color');
+//
+//   console.log(color);
+// })();
 
 // ESbuild plugin
 export const unpkgPathPlugin = () => {
@@ -43,12 +56,27 @@ export const unpkgPathPlugin = () => {
                 `,
           };
         }
+
+        // Check to sett if we have already fetched this file
+        // and if it is int the cache
+        const cachedResult = await fileCache.getItem(args.path);
+
+        // if it is, return it immediately
+        if (cachedResult) {
+          return cachedResult;
+        }
+
         const { data, request } = await axios.get(args.path);
-        return {
+
+        const result = {
           loader: 'jsx',
           contents: data,
           resolveDir: new URL('./', request.responseURL).pathname,
         };
+
+        // store response in cache
+        await fileCache.setItem(args.path, result);
+        return result;
       });
     },
   };
