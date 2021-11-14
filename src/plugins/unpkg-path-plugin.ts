@@ -1,10 +1,4 @@
 import * as esbuild from 'esbuild-wasm';
-import axios from 'axios';
-import localForage from 'localforage';
-
-const fileCache = localForage.createInstance({
-  name: 'filecache',
-});
 
 // (async () => {
 //   await fileCache.setItem('color', 'red');
@@ -15,7 +9,7 @@ const fileCache = localForage.createInstance({
 // })();
 
 // ESbuild plugin
-export const unpkgPathPlugin = (inputCode: string) => {
+export const unpkgPathPlugin = () => {
   return {
     // The name property is used only for debugging.
     name: 'unpkg-path-plugin',
