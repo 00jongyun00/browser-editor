@@ -1,4 +1,5 @@
 import * as esbuild from 'esbuild-wasm';
+import axios from 'axios';
 
 // ESbuild plugin
 export const unpkgPathPlugin = () => {
@@ -10,8 +11,15 @@ export const unpkgPathPlugin = () => {
     setup(build: esbuild.PluginBuild) {
       // onResolve: index.js 가 어디에 있는지 알아내는 과정, 미해결 단계
       build.onResolve({ filter: /.*/ }, async (args: any) => {
-        console.log('onResole', args);
-        return { path: args.path, namespace: 'a' };
+        console.log('onResolve', args);
+        if (args.path === 'index.js') {
+          return { path: args.path, namespace: 'a' };
+        } else {
+          return {
+            path: 'https://unpkg.com/tiny-test-pkg@1.0.0/index.js',
+            namespace: 'a',
+          };
+        }
       });
 
       build.onLoad({ filter: /.*/ }, async (args: any) => {
@@ -22,11 +30,16 @@ export const unpkgPathPlugin = () => {
           return {
             loader: 'jsx',
             contents: `
-                  import message from 'tiny-test-pkg';
+                  const message = require('tiny-test-pkg');
                   console.log(message);
                 `,
           };
         }
+        const { data } = await axios.get(args.path);
+        return {
+          loader: 'jsx',
+          contents: data,
+        };
       });
     },
   };
